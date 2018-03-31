@@ -1,0 +1,96 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define minimum(a,b) a<b?a:b
+int V=4;
+int **tcoe;
+int bfs(int adjmtx[][4],int source,int sink,int par[],int cost[])
+{
+	int queue[16],top=0,front=0;
+	queue[top++]=source;
+	while(front!=top)
+	{
+		int i,curr=queue[front++];
+		if(curr==sink)
+		{
+			return 1;
+		}
+		for(i=0;i<V;i++)
+		{
+			if(adjmtx[curr][i]>0)
+			{
+				par[i]=curr;
+				queue[top++]=i;
+				cost[i]=adjmtx[curr][i];
+			}
+		}
+	}
+	return 0;
+}
+
+void ford(int adjmtx[][4],int source,int sink)
+{
+	int j,i,par[4]={-1},cost[4]={-1},tc=0;
+	while(bfs(adjmtx,source,sink,par,cost))
+	{
+		int temp=sink,min=100000;
+		while(temp!=source)
+		{
+			min=minimum(min,cost[temp]);
+			temp=par[temp];
+		}
+		tc+=min;
+		temp=sink;
+		while(temp!=source)
+		{
+			adjmtx[par[temp]][temp]-=min;
+			adjmtx[temp][par[temp]]+=min;
+			int ti=temp,tj=par[temp];
+			if(ti>tj)
+			{
+				ti=tj;
+				tj=temp;
+			}
+			tcoe[ti][tj]+=min;
+			temp=par[temp];
+		}
+
+		for(i=0;i<4;i++)
+		{
+			cost[i]=par[i]=-1;
+		}
+		for(i=0;i<V;i++)
+		{
+			for(j=0;j<V;j++)
+			{
+				printf("%d ",tcoe[i][j]);
+			}
+			printf("\n");
+		}
+		printf("Total Flow %d\n",tc);
+	}
+}
+
+main()
+{
+	int e,i,j,k;
+	scanf("%d%d",&V,&e);
+	int adjmtx[V][V];
+	tcoe=(int**)malloc(sizeof(int*)*V);
+	for(i=0;i<V;i++)
+	{
+		tcoe[i]=(int*)malloc(sizeof(int)*V);
+		for(j=0;j<V;j++)
+		{
+			tcoe[i][j]=adjmtx[i][j]=0;
+		}
+	}
+	while(e--)
+	{
+		scanf("%d%d%d",&i,&j,&k);
+		i--,j--;
+		adjmtx[i][j]=k;
+	}
+	int source,sink;
+	scanf("%d%d",&source,&sink);
+	ford(adjmtx,source,sink);
+}
