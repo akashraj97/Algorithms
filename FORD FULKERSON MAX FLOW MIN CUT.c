@@ -1,11 +1,23 @@
 #include<stdio.h>
 #include<stdlib.h>
 #define minimum(a,b) a<b?a:b
-int V=4;
+int V=6;
 int **tcoe;
-int bfs(int adjmtx[][4],int source,int sink,int par[],int cost[])
+
+int noLoop(int par[],int curr,int i)
 {
-	int queue[16],top=0,front=0;
+	while(par[curr]!=-1)
+	{
+		if(par[curr]==i)
+			return 0;
+		curr=par[curr];
+	}
+	return 1;
+}
+
+int bfs(int adjmtx[][6],int source,int sink,int par[],int cost[])
+{
+	int queue[36],top=0,front=0;
 	queue[top++]=source;
 	while(front!=top)
 	{
@@ -16,7 +28,7 @@ int bfs(int adjmtx[][4],int source,int sink,int par[],int cost[])
 		}
 		for(i=0;i<V;i++)
 		{
-			if(adjmtx[curr][i]>0)
+			if(adjmtx[curr][i]>0 && noLoop(par,curr,i))
 			{
 				par[i]=curr;
 				queue[top++]=i;
@@ -27,9 +39,9 @@ int bfs(int adjmtx[][4],int source,int sink,int par[],int cost[])
 	return 0;
 }
 
-void ford(int adjmtx[][4],int source,int sink)
+void forda(int adjmtx[][6],int source,int sink)
 {
-	int j,i,par[4]={-1},cost[4]={-1},tc=0;
+	int j,i,par[6]={-1},cost[6]={-1},tc=0;
 	while(bfs(adjmtx,source,sink,par,cost))
 	{
 		int temp=sink,min=100000;
@@ -53,8 +65,7 @@ void ford(int adjmtx[][4],int source,int sink)
 			tcoe[ti][tj]+=min;
 			temp=par[temp];
 		}
-
-		for(i=0;i<4;i++)
+		for(i=0;i<V;i++)
 		{
 			cost[i]=par[i]=-1;
 		}
@@ -70,7 +81,7 @@ void ford(int adjmtx[][4],int source,int sink)
 	}
 }
 
-main()
+int main()
 {
 	int e,i,j,k;
 	scanf("%d%d",&V,&e);
@@ -92,5 +103,5 @@ main()
 	}
 	int source,sink;
 	scanf("%d%d",&source,&sink);
-	ford(adjmtx,source,sink);
+	forda(adjmtx,source,sink);
 }
